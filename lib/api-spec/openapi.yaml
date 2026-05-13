@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Novel World API - Upload novels and explore characters, events, voices and images
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: novels
+    description: Novel management
+  - name: characters
+    description: Character operations
+  - name: events
+    description: Story events and scenes
 paths:
   /healthz:
     get:
@@ -24,6 +30,239 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /novels:
+    get:
+      operationId: listNovels
+      tags: [novels]
+      summary: List all uploaded novels
+      responses:
+        "200":
+          description: List of novels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Novel"
+
+  /novels/upload:
+    post:
+      operationId: uploadNovel
+      tags: [novels]
+      summary: Upload a novel PDF for analysis
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/NovelUpload"
+      responses:
+        "201":
+          description: Novel uploaded and queued for analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Novel"
+
+  /novels/{novelId}:
+    get:
+      operationId: getNovel
+      tags: [novels]
+      summary: Get novel details
+      parameters:
+        - name: novelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Novel details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Novel"
+        "404":
+          description: Not found
+
+  /novels/{novelId}/analyze:
+    post:
+      operationId: analyzeNovel
+      tags: [novels]
+      summary: Trigger AI analysis of the novel
+      parameters:
+        - name: novelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analysis started or completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Novel"
+
+  /novels/{novelId}/characters:
+    get:
+      operationId: listCharacters
+      tags: [characters]
+      summary: List all characters in a novel
+      parameters:
+        - name: novelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of characters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Character"
+
+  /novels/{novelId}/events:
+    get:
+      operationId: listEvents
+      tags: [events]
+      summary: List story events and scenes
+      parameters:
+        - name: novelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StoryEvent"
+
+  /characters/{characterId}:
+    get:
+      operationId: getCharacter
+      tags: [characters]
+      summary: Get character details
+      parameters:
+        - name: characterId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Character details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+
+  /characters/{characterId}/generate-image:
+    post:
+      operationId: generateCharacterImage
+      tags: [characters]
+      summary: Generate AI portrait image for a character
+      parameters:
+        - name: characterId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Image generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+
+  /characters/{characterId}/lines:
+    get:
+      operationId: listCharacterLines
+      tags: [characters]
+      summary: Get all dialogue lines for a character
+      parameters:
+        - name: characterId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dialogue lines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DialogueLine"
+
+  /dialogue/{lineId}/generate-audio:
+    post:
+      operationId: generateLineAudio
+      tags: [characters]
+      summary: Generate TTS audio for a dialogue line
+      parameters:
+        - name: lineId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Audio generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DialogueLine"
+
+  /events/{eventId}/generate-image:
+    post:
+      operationId: generateEventImage
+      tags: [events]
+      summary: Generate scene image for a story event
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Image generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoryEvent"
+
+  /novels/{novelId}/summary:
+    get:
+      operationId: getNovelSummary
+      tags: [novels]
+      summary: Get a rich summary of the novel with stats
+      parameters:
+        - name: novelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Novel summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NovelSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +273,137 @@ components:
       required:
         - status
 
+    Novel:
+      type: object
+      required: [id, title, status, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        originalFilename:
+          type: string
+        status:
+          type: string
+          enum: [uploaded, analyzing, ready, error]
+        pageCount:
+          type: ["integer", "null"]
+        wordCount:
+          type: ["integer", "null"]
+        language:
+          type: ["string", "null"]
+        synopsis:
+          type: ["string", "null"]
+        coverImageUrl:
+          type: ["string", "null"]
+        characterCount:
+          type: ["integer", "null"]
+        eventCount:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    NovelUpload:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+        title:
+          type: string
+
+    NovelSummary:
+      type: object
+      required: [novel, characterCount, eventCount, dialogueCount]
+      properties:
+        novel:
+          $ref: "#/components/schemas/Novel"
+        characterCount:
+          type: integer
+        eventCount:
+          type: integer
+        dialogueCount:
+          type: integer
+        topCharacters:
+          type: array
+          items:
+            $ref: "#/components/schemas/Character"
+        recentEvents:
+          type: array
+          items:
+            $ref: "#/components/schemas/StoryEvent"
+
+    Character:
+      type: object
+      required: [id, novelId, name, role]
+      properties:
+        id:
+          type: integer
+        novelId:
+          type: integer
+        name:
+          type: string
+        role:
+          type: string
+          enum: [protagonist, antagonist, supporting, minor]
+        description:
+          type: ["string", "null"]
+        personality:
+          type: ["string", "null"]
+        physicalDescription:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        voiceStyle:
+          type: ["string", "null"]
+        dialogueCount:
+          type: ["integer", "null"]
+        color:
+          type: ["string", "null"]
+
+    DialogueLine:
+      type: object
+      required: [id, characterId, novelId, text, chapterNumber]
+      properties:
+        id:
+          type: integer
+        characterId:
+          type: integer
+        novelId:
+          type: integer
+        text:
+          type: string
+        chapterNumber:
+          type: integer
+        pageNumber:
+          type: ["integer", "null"]
+        audioUrl:
+          type: ["string", "null"]
+        context:
+          type: ["string", "null"]
+
+    StoryEvent:
+      type: object
+      required: [id, novelId, title, chapterNumber]
+      properties:
+        id:
+          type: integer
+        novelId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        chapterNumber:
+          type: integer
+        location:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        characters:
+          type: array
+          items:
+            type: string
+        emotionalTone:
+          type: ["string", "null"]
