@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 export function HomePage() {
-  const { data: novels, isLoading } = useListNovels();
+  const { data: novelsData, isLoading } = useListNovels();
+  const novels = Array.isArray(novelsData) ? novelsData : [];
 
   return (
     <Layout>
