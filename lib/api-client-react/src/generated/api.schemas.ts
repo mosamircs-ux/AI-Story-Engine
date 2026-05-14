@@ -37,6 +37,10 @@ export interface Novel {
   characterCount?: number | null;
   /** @nullable */
   eventCount?: number | null;
+  /** @nullable */
+  movieUrl?: string | null;
+  /** @nullable */
+  movieStatus?: string | null;
   createdAt: string;
 }
 

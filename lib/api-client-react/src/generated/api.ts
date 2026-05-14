@@ -1049,6 +1049,90 @@ export const useGenerateEventImage = <
 };
 
 /**
+ * @summary Compose a movie from scene images and dialogue audio
+ */
+export const getComposeMovieUrl = (novelId: number) => {
+  return `/api/novels/${novelId}/compose-movie`;
+};
+
+export const composeMovie = async (
+  novelId: number,
+  options?: RequestInit,
+): Promise<Novel> => {
+  return customFetch<Novel>(getComposeMovieUrl(novelId), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getComposeMovieMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof composeMovie>>,
+    TError,
+    { novelId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof composeMovie>>,
+  TError,
+  { novelId: number },
+  TContext
+> => {
+  const mutationKey = ["composeMovie"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof composeMovie>>,
+    { novelId: number }
+  > = (props) => {
+    const { novelId } = props ?? {};
+
+    return composeMovie(novelId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ComposeMovieMutationResult = NonNullable<
+  Awaited<ReturnType<typeof composeMovie>>
+>;
+
+export type ComposeMovieMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Compose a movie from scene images and dialogue audio
+ */
+export const useComposeMovie = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof composeMovie>>,
+    TError,
+    { novelId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof composeMovie>>,
+  TError,
+  { novelId: number },
+  TContext
+> => {
+  return useMutation(getComposeMovieMutationOptions(options));
+};
+
+/**
  * @summary List all locations in a novel
  */
 export const getListLocationsUrl = (novelId: number) => {

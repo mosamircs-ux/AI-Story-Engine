@@ -16,6 +16,8 @@ export const novels = pgTable("novels", {
   characterCount: integer("character_count"),
   eventCount: integer("event_count"),
   rawText: text("raw_text"),
+  movieUrl: text("movie_url"),
+  movieStatus: text("movie_status"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

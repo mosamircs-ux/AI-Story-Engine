@@ -5,6 +5,7 @@ import charactersRouter from "./characters";
 import charactersListRouter from "./characters-list";
 import eventsRouter from "./events";
 import locationsRouter from "./locations";
+import composeRouter from "./compose";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(charactersRouter);
 router.use(charactersListRouter);
 router.use(eventsRouter);
 router.use(locationsRouter);
+router.use(composeRouter);
 
 export default router;

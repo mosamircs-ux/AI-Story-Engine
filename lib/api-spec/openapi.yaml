@@ -246,6 +246,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/StoryEvent"
 
+  /novels/{novelId}/compose-movie:
+    post:
+      operationId: composeMovie
+      tags: [novels]
+      summary: Compose a movie from scene images and dialogue audio
+      parameters:
+        - name: novelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Composition started or already complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Novel"
+
   /novels/{novelId}/locations:
     get:
       operationId: listLocations
@@ -342,6 +361,10 @@ components:
           type: ["integer", "null"]
         eventCount:
           type: ["integer", "null"]
+        movieUrl:
+          type: ["string", "null"]
+        movieStatus:
+          type: ["string", "null"]
         createdAt:
           type: string
 

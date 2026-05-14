@@ -30,6 +30,8 @@ export const ListNovelsResponseItem = zod.object({
   coverImageUrl: zod.string().nullish(),
   characterCount: zod.number().nullish(),
   eventCount: zod.number().nullish(),
+  movieUrl: zod.string().nullish(),
+  movieStatus: zod.string().nullish(),
   createdAt: zod.string(),
 });
 export const ListNovelsResponse = zod.array(ListNovelsResponseItem);
@@ -61,6 +63,8 @@ export const GetNovelResponse = zod.object({
   coverImageUrl: zod.string().nullish(),
   characterCount: zod.number().nullish(),
   eventCount: zod.number().nullish(),
+  movieUrl: zod.string().nullish(),
+  movieStatus: zod.string().nullish(),
   createdAt: zod.string(),
 });
 
@@ -83,6 +87,8 @@ export const AnalyzeNovelResponse = zod.object({
   coverImageUrl: zod.string().nullish(),
   characterCount: zod.number().nullish(),
   eventCount: zod.number().nullish(),
+  movieUrl: zod.string().nullish(),
+  movieStatus: zod.string().nullish(),
   createdAt: zod.string(),
 });
 
@@ -243,6 +249,30 @@ export const GenerateEventImageResponse = zod.object({
 });
 
 /**
+ * @summary Compose a movie from scene images and dialogue audio
+ */
+export const ComposeMovieParams = zod.object({
+  novelId: zod.coerce.number(),
+});
+
+export const ComposeMovieResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  originalFilename: zod.string().optional(),
+  status: zod.enum(["uploaded", "analyzing", "ready", "error"]),
+  pageCount: zod.number().nullish(),
+  wordCount: zod.number().nullish(),
+  language: zod.string().nullish(),
+  synopsis: zod.string().nullish(),
+  coverImageUrl: zod.string().nullish(),
+  characterCount: zod.number().nullish(),
+  eventCount: zod.number().nullish(),
+  movieUrl: zod.string().nullish(),
+  movieStatus: zod.string().nullish(),
+  createdAt: zod.string(),
+});
+
+/**
  * @summary List all locations in a novel
  */
 export const ListLocationsParams = zod.object({
@@ -299,6 +329,8 @@ export const GetNovelSummaryResponse = zod.object({
     coverImageUrl: zod.string().nullish(),
     characterCount: zod.number().nullish(),
     eventCount: zod.number().nullish(),
+    movieUrl: zod.string().nullish(),
+    movieStatus: zod.string().nullish(),
     createdAt: zod.string(),
   }),
   characterCount: zod.number(),

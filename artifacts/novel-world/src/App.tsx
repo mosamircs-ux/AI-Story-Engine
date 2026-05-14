@@ -10,6 +10,8 @@ import { EventsTimeline } from "@/pages/events-timeline";
 import { DialoguePlayer } from "@/pages/dialogue-player";
 import { LocationsGallery } from "@/pages/locations-gallery";
 import { Cinema } from "@/pages/cinema";
+import { Storyboard } from "@/pages/storyboard";
+import { MovieComposer } from "@/pages/movie-composer";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ function Router() {
       <Route path="/novels/:novelId/dialogue" component={DialoguePlayer} />
       <Route path="/novels/:novelId/locations" component={LocationsGallery} />
       <Route path="/novels/:novelId/cinema" component={Cinema} />
+      <Route path="/novels/:novelId/storyboard" component={Storyboard} />
+      <Route path="/novels/:novelId/movie" component={MovieComposer} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useRoute } from "wouter";
-import { BookOpen, Users, Clock, MessageSquare, Home, MapPin, Clapperboard } from "lucide-react";
+import { BookOpen, Users, Clock, MessageSquare, Home, MapPin, Clapperboard, LayoutGrid, Film } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -28,6 +28,9 @@ export function Layout({ children, novelId }: LayoutProps) {
             <NavItem href={`/novels/${novelId}/dialogue`} icon={MessageSquare} label="Dialogue" />
             <NavItem href={`/novels/${novelId}/locations`} icon={MapPin} label="Locations" />
             <NavItem href={`/novels/${novelId}/cinema`} icon={Clapperboard} label="Cinema" />
+            <div className="h-px bg-border my-2 mx-2" />
+            <NavItem href={`/novels/${novelId}/storyboard`} icon={LayoutGrid} label="Storyboard" />
+            <NavItem href={`/novels/${novelId}/movie`} icon={Film} label="Movie" />
           </div>
         </nav>
       )}
