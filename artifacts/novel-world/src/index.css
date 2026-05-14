@@ -241,3 +241,16 @@
     inset: -1px;
   }
 }
+
+@keyframes ken-burns {
+  0%   { transform: scale(1.1) translate(0%, 0%); }
+  25%  { transform: scale(1.15) translate(-1%, -1%); }
+  50%  { transform: scale(1.1) translate(1%, 0%); }
+  75%  { transform: scale(1.15) translate(-0.5%, 1%); }
+  100% { transform: scale(1.1) translate(0%, 0%); }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 20s ease-in-out infinite;
+  transform-origin: center center;
+}

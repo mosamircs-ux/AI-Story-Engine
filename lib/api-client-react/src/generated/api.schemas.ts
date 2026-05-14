@@ -124,3 +124,18 @@ export interface DialogueLine {
   /** @nullable */
   addressedTo?: string | null;
 }
+
+export interface Location {
+  id: number;
+  novelId: number;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  atmosphere?: string | null;
+  /** @nullable */
+  category?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
+  appearsInChapters?: string[] | null;
+}

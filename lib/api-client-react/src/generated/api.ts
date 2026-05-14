@@ -20,6 +20,7 @@ import type {
   Character,
   DialogueLine,
   HealthStatus,
+  Location,
   Novel,
   NovelSummary,
   NovelUpload,
@@ -1045,6 +1046,177 @@ export const useGenerateEventImage = <
   TContext
 > => {
   return useMutation(getGenerateEventImageMutationOptions(options));
+};
+
+/**
+ * @summary List all locations in a novel
+ */
+export const getListLocationsUrl = (novelId: number) => {
+  return `/api/novels/${novelId}/locations`;
+};
+
+export const listLocations = async (
+  novelId: number,
+  options?: RequestInit,
+): Promise<Location[]> => {
+  return customFetch<Location[]>(getListLocationsUrl(novelId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListLocationsQueryKey = (novelId: number) => {
+  return [`/api/novels/${novelId}/locations`] as const;
+};
+
+export const getListLocationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listLocations>>,
+  TError = ErrorType<unknown>,
+>(
+  novelId: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listLocations>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListLocationsQueryKey(novelId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listLocations>>> = ({
+    signal,
+  }) => listLocations(novelId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!novelId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listLocations>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListLocationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listLocations>>
+>;
+export type ListLocationsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all locations in a novel
+ */
+
+export function useListLocations<
+  TData = Awaited<ReturnType<typeof listLocations>>,
+  TError = ErrorType<unknown>,
+>(
+  novelId: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listLocations>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListLocationsQueryOptions(novelId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Generate atmospheric image for a location
+ */
+export const getGenerateLocationImageUrl = (locationId: number) => {
+  return `/api/locations/${locationId}/generate-image`;
+};
+
+export const generateLocationImage = async (
+  locationId: number,
+  options?: RequestInit,
+): Promise<Location> => {
+  return customFetch<Location>(getGenerateLocationImageUrl(locationId), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getGenerateLocationImageMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateLocationImage>>,
+    TError,
+    { locationId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateLocationImage>>,
+  TError,
+  { locationId: number },
+  TContext
+> => {
+  const mutationKey = ["generateLocationImage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateLocationImage>>,
+    { locationId: number }
+  > = (props) => {
+    const { locationId } = props ?? {};
+
+    return generateLocationImage(locationId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateLocationImageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateLocationImage>>
+>;
+
+export type GenerateLocationImageMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Generate atmospheric image for a location
+ */
+export const useGenerateLocationImage = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateLocationImage>>,
+    TError,
+    { locationId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateLocationImage>>,
+  TError,
+  { locationId: number },
+  TContext
+> => {
+  return useMutation(getGenerateLocationImageMutationOptions(options));
 };
 
 /**

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "wouter";
 import { 
-  useGetNovel, getGetNovelQueryKey,
   useListCharacters, getListCharactersQueryKey,
   useGenerateLineAudio
 } from "@workspace/api-client-react";
@@ -40,7 +39,7 @@ export function DialoguePlayer() {
   const queryClient = useQueryClient();
 
   const { data: characters } = useListCharacters(novelId, {
-    query: { enabled: !!novelId }
+    query: { enabled: !!novelId, queryKey: getListCharactersQueryKey(novelId) }
   });
 
   const { data: lines, isLoading } = useAllNovelDialogue(novelId, characters || []);
@@ -138,7 +137,7 @@ export function DialoguePlayer() {
                 </div>
 
                 <div className="space-y-6">
-                  {groupedLines?.[chapter].map(line => {
+                  {groupedLines?.[chapter].map((line: any) => {
                     const char = characters?.find(c => c.id === line.characterId);
                     const isGenerating = generateAudio.isPending && generateAudio.variables?.lineId === line.id;
                     const isPlaying = playingId === line.id;

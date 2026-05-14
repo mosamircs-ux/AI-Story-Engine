@@ -16,6 +16,8 @@ tags:
     description: Character operations
   - name: events
     description: Story events and scenes
+  - name: locations
+    description: Story locations and places
 paths:
   /healthz:
     get:
@@ -244,6 +246,46 @@ paths:
               schema:
                 $ref: "#/components/schemas/StoryEvent"
 
+  /novels/{novelId}/locations:
+    get:
+      operationId: listLocations
+      tags: [locations]
+      summary: List all locations in a novel
+      parameters:
+        - name: novelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Location"
+
+  /locations/{locationId}/generate-image:
+    post:
+      operationId: generateLocationImage
+      tags: [locations]
+      summary: Generate atmospheric image for a location
+      parameters:
+        - name: locationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Image generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Location"
+
   /novels/{novelId}/summary:
     get:
       operationId: getNovelSummary
@@ -393,6 +435,30 @@ components:
           type: ["string", "null"]
         addressedTo:
           type: ["string", "null"]
+
+    Location:
+      type: object
+      required: [id, novelId, name]
+      properties:
+        id:
+          type: integer
+        novelId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        atmosphere:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+        appearsInChapters:
+          type: array
+          items:
+            type: string
+          nullable: true
 
     StoryEvent:
       type: object

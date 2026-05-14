@@ -6,13 +6,14 @@
  * Phase 3: Dialogue attribution per chunk (who says what)
  * Phase 4: Event extraction per chunk
  * Phase 5: Character enrichment (relationships, synthesis)
+ * Phase 5b: Location extraction
  * Phase 6: Cover image generation
  */
 
 import fs from "fs";
 import path from "path";
 import { db } from "@workspace/db";
-import { novels, characters, dialogueLines, storyEvents } from "@workspace/db";
+import { novels, characters, dialogueLines, storyEvents, locations } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { generateImageBuffer } from "@workspace/integrations-openai-ai-server/image";
@@ -53,6 +54,14 @@ interface ExtractedEvent {
   location: string;
   emotionalTone: string;
   characters: string[];
+}
+
+interface ExtractedLocation {
+  name: string;
+  description: string;
+  atmosphere: string;
+  category: string;
+  appearsInChapters: string[];
 }
 
 interface ChunkAnalysis {
@@ -251,6 +260,56 @@ Events rules:
   }
 }
 
+// ─── Phase 5b: Location Extraction ───────────────────────────────────────────
+
+async function extractLocations(
+  novelTitle: string,
+  allEvents: ExtractedEvent[],
+  language: string,
+): Promise<ExtractedLocation[]> {
+  // Build a list of unique location names from events for context
+  const rawLocs = [...new Set(allEvents.map((e) => e.location).filter(Boolean))];
+  if (rawLocs.length === 0) return [];
+
+  const eventSummary = allEvents
+    .filter((e) => e.location)
+    .slice(0, 30)
+    .map((e) => `- ${e.location}: ${e.description ?? ""}`)
+    .join("\n");
+
+  const prompt = `You are a literary analyst. Based on these story events from the ${language} novel "${novelTitle}", extract all significant LOCATIONS/PLACES.
+
+Events and their locations:
+${eventSummary}
+
+Return JSON:
+{
+  "locations": [
+    {
+      "name": "Location name",
+      "description": "What this place is and its role in the story (1-2 sentences)",
+      "atmosphere": "The mood/feeling of this place: dark/mystical/grand/intimate/dangerous/peaceful etc.",
+      "category": "city|castle|village|forest|desert|palace|market|house|prison|battlefield|sea|other",
+      "appearsInChapters": ["1", "3", "5"]
+    }
+  ]
+}
+
+Rules:
+- Merge duplicate/similar locations (e.g. "the castle" and "the palace" might be the same place)
+- Include only locations that matter to the story
+- Use the most vivid, specific name for each location
+- Maximum 15 locations`;
+
+  try {
+    const raw = await callGPT(prompt);
+    const parsed = JSON.parse(raw);
+    return (parsed.locations ?? []) as ExtractedLocation[];
+  } catch {
+    return [];
+  }
+}
+
 // ─── Phase 5: Character Enrichment ───────────────────────────────────────────
 
 async function enrichCharacters(
@@ -425,8 +484,11 @@ Return JSON: { "synopsis": "..." }`;
   const allDialogue: ExtractedDialogue[] = chunkResults.flatMap((r) => r.dialogue);
   const allEvents: ExtractedEvent[] = chunkResults.flatMap((r) => r.events);
 
-  // ── PHASE 5: Character Enrichment ──
-  const enrichedChars = await enrichCharacters(novelTitle, extractedChars, allDialogue);
+  // ── PHASE 5: Character Enrichment + Location Extraction (parallel) ──
+  const [enrichedChars, extractedLocations] = await Promise.all([
+    enrichCharacters(novelTitle, extractedChars, allDialogue),
+    extractLocations(novelTitle, allEvents, language),
+  ]);
 
   // Update characters with enriched data
   for (const enriched of enrichedChars) {
@@ -440,6 +502,18 @@ Return JSON: { "synopsis": "..." }`;
         relationships: enriched.relationships ?? null,
       })
       .where(eq(characters.id, charId));
+  }
+
+  // ── Save Locations ──
+  for (const loc of extractedLocations) {
+    await db.insert(locations).values({
+      novelId,
+      name: loc.name,
+      description: loc.description ?? null,
+      atmosphere: loc.atmosphere ?? null,
+      category: loc.category ?? null,
+      appearsInChapters: loc.appearsInChapters ?? [],
+    });
   }
 
   // ── Save Dialogue Lines ──

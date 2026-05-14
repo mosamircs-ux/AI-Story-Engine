@@ -23,3 +23,4 @@ export * from "./novels";
 export * from "./characters";
 export * from "./dialogue_lines";
 export * from "./story_events";
+export * from "./locations";

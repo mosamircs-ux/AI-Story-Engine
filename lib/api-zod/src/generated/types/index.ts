@@ -10,6 +10,7 @@ export * from "./character";
 export * from "./characterRole";
 export * from "./dialogueLine";
 export * from "./healthStatus";
+export * from "./location";
 export * from "./novel";
 export * from "./novelStatus";
 export * from "./novelSummary";

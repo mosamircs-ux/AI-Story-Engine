@@ -243,6 +243,43 @@ export const GenerateEventImageResponse = zod.object({
 });
 
 /**
+ * @summary List all locations in a novel
+ */
+export const ListLocationsParams = zod.object({
+  novelId: zod.coerce.number(),
+});
+
+export const ListLocationsResponseItem = zod.object({
+  id: zod.number(),
+  novelId: zod.number(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  atmosphere: zod.string().nullish(),
+  category: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  appearsInChapters: zod.array(zod.string()).nullish(),
+});
+export const ListLocationsResponse = zod.array(ListLocationsResponseItem);
+
+/**
+ * @summary Generate atmospheric image for a location
+ */
+export const GenerateLocationImageParams = zod.object({
+  locationId: zod.coerce.number(),
+});
+
+export const GenerateLocationImageResponse = zod.object({
+  id: zod.number(),
+  novelId: zod.number(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  atmosphere: zod.string().nullish(),
+  category: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  appearsInChapters: zod.array(zod.string()).nullish(),
+});
+
+/**
  * @summary Get a rich summary of the novel with stats
  */
 export const GetNovelSummaryParams = zod.object({

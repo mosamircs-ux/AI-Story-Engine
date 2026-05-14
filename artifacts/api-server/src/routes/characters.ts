@@ -15,6 +15,43 @@ import { textToSpeech } from "@workspace/integrations-openai-ai-server/audio";
 
 const router = Router();
 
+type TTSVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
+
+function pickVoice(character: { role: string | null; personality: string | null; name: string; voiceStyle: string | null } | undefined): TTSVoice {
+  if (!character) return "alloy";
+
+  const role = character.role ?? "";
+  const personality = (character.personality ?? "").toLowerCase();
+  const voiceStyle = (character.voiceStyle ?? "").toLowerCase();
+  const name = character.name.toLowerCase();
+
+  // Detect female cues
+  const femaleCues = ["she", "her", "female", "woman", "girl", "lady", "queen", "princess", "mother", "sister", "aunt", "wife",
+    "هي", "امرأة", "فتاة", "ملكة", "أميرة", "أم", "أخت"];
+  const isFemale = femaleCues.some(cue => personality.includes(cue) || voiceStyle.includes(cue) || name.includes(cue));
+
+  if (isFemale) {
+    // shimmer = warm/soft, nova = confident/clear
+    const isGentle = ["gentle", "soft", "warm", "kind", "shy", "quiet", "هادئة", "رقيقة"].some(c => personality.includes(c) || voiceStyle.includes(c));
+    return isGentle ? "shimmer" : "nova";
+  }
+
+  // Male voices
+  if (role === "antagonist") return "onyx"; // deep, authoritative
+  if (role === "protagonist") {
+    const isIntense = ["intense", "serious", "determined", "bold", "جاد", "حازم", "قوي"].some(c => personality.includes(c) || voiceStyle.includes(c));
+    return isIntense ? "echo" : "alloy";
+  }
+  if (role === "supporting") {
+    const isWise = ["wise", "old", "elder", "mentor", "حكيم", "عجوز", "شيخ"].some(c => personality.includes(c) || name.includes(c));
+    return isWise ? "fable" : "echo";
+  }
+
+  // Minor or unknown — deterministic fallback
+  const voices: TTSVoice[] = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"];
+  return voices[Math.abs(character.name.charCodeAt(0) ?? 0) % voices.length];
+}
+
 const publicDir = "/tmp/novel-assets";
 if (!fs.existsSync(publicDir)) {
   fs.mkdirSync(publicDir, { recursive: true });
@@ -96,14 +133,10 @@ router.post("/dialogue/:lineId/generate-audio", async (req, res) => {
 
   const [character] = await db.select().from(characters).where(eq(characters.id, line.characterId));
 
-  // Choose voice based on character role or gender cues
-  const voices: Array<"alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"> = [
-    "alloy", "echo", "fable", "onyx", "nova", "shimmer",
-  ];
-  const voiceIndex = line.characterId % voices.length;
-  const voice = voices[voiceIndex];
+  // Pick voice based on role, personality, and gender cues in name/description
+  const voice = pickVoice(character);
 
-  const audioBuffer = await textToSpeech(line.text, voice);
+  const audioBuffer = await textToSpeech(line.text, voice, "mp3");
   const audioPath = path.join(publicDir, `audio-${lineId}.mp3`);
   fs.writeFileSync(audioPath, audioBuffer);
   const audioUrl = `/api/assets/audio-${lineId}.mp3`;
