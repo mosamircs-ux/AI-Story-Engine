@@ -161,6 +161,19 @@ export function CharacterDetail() {
             </div>
 
             <div className="p-8 space-y-8 flex-1 bg-background/50 backdrop-blur-sm">
+              {character.aliases && character.aliases.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-2">Also known as</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {character.aliases.map((alias, i) => (
+                      <span key={i} className="text-xs px-2 py-1 rounded border border-border/50 bg-muted/30 text-muted-foreground font-mono">
+                        {alias}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {character.voiceStyle && (
                 <div>
                   <h4 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-2">Voice Style</h4>
@@ -191,6 +204,31 @@ export function CharacterDetail() {
             <h2 className="font-serif text-2xl border-b border-border pb-4 mb-6">Profile</h2>
             <p className="text-lg leading-relaxed">{character.description || "No description available."}</p>
           </div>
+
+          {character.relationships && (() => {
+            let rels: Record<string, string> = {};
+            try { rels = JSON.parse(character.relationships); } catch { return null; }
+            const entries = Object.entries(rels);
+            if (!entries.length) return null;
+            return (
+              <div className="mb-16">
+                <h2 className="font-serif text-2xl border-b border-border pb-4 mb-8">Relationships</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {entries.map(([name, rel]) => (
+                    <div key={name} className="flex items-center gap-4 p-4 rounded-lg border border-border/50 bg-card/20">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="font-serif text-sm font-bold text-primary">{name.charAt(0)}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground truncate">{name}</p>
+                        <p className="text-xs text-muted-foreground font-mono capitalize">{rel}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           <div>
             <h2 className="font-serif text-2xl border-b border-border pb-4 mb-8 flex items-center gap-3">
@@ -239,10 +277,15 @@ export function CharacterDetail() {
                         
                         <div className="flex-1">
                           <p className="text-lg font-serif leading-relaxed text-foreground/90">"{line.text}"</p>
-                          {(line.context || line.chapterNumber) && (
-                            <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground font-mono">
+                          {(line.context || line.chapterNumber || line.addressedTo) && (
+                            <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground font-mono">
                               {line.chapterNumber && <span>CH. {line.chapterNumber}</span>}
                               {line.pageNumber && <span>PG. {line.pageNumber}</span>}
+                              {line.addressedTo && (
+                                <span className="border border-border/50 px-2 py-0.5 rounded-full">
+                                  to {line.addressedTo}
+                                </span>
+                              )}
                               {line.context && <span className="italic line-clamp-1 border-l border-border pl-3">Context: {line.context}</span>}
                             </div>
                           )}

@@ -25,6 +25,7 @@ function useAllNovelDialogue(novelId: number, characters: any[]) {
       const allLines = results.flat() as any[];
       return allLines.sort((a, b) => {
         if (a.chapterNumber !== b.chapterNumber) return a.chapterNumber - b.chapterNumber;
+        if ((a.sequenceOrder ?? 0) !== (b.sequenceOrder ?? 0)) return (a.sequenceOrder ?? 0) - (b.sequenceOrder ?? 0);
         if (a.pageNumber !== b.pageNumber) return (a.pageNumber || 0) - (b.pageNumber || 0);
         return a.id - b.id;
       });
@@ -173,6 +174,11 @@ export function DialoguePlayer() {
                           <p className="text-lg md:text-xl font-serif leading-relaxed text-foreground/90">
                             "{line.text}"
                           </p>
+                          {line.addressedTo && (
+                            <p className="text-xs font-mono text-muted-foreground/60 mt-1">
+                              → {line.addressedTo}
+                            </p>
+                          )}
                           {line.context && (
                             <p className="text-sm text-muted-foreground/70 italic mt-2 border-l-2 pl-3" style={{ borderColor: 'var(--line-color)' }}>
                               {line.context}

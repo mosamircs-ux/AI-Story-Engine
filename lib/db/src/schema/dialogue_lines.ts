@@ -10,9 +10,11 @@ export const dialogueLines = pgTable("dialogue_lines", {
   characterId: integer("character_id").notNull().references(() => characters.id, { onDelete: "cascade" }),
   text: text("text").notNull(),
   chapterNumber: integer("chapter_number").notNull().default(1),
+  sequenceOrder: integer("sequence_order").default(0),
   pageNumber: integer("page_number"),
   audioUrl: text("audio_url"),
   context: text("context"),
+  addressedTo: text("addressed_to"),
 });
 
 export const insertDialogueLineSchema = createInsertSchema(dialogueLines).omit({

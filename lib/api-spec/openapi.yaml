@@ -344,6 +344,11 @@ components:
           type: integer
         name:
           type: string
+        aliases:
+          type: array
+          items:
+            type: string
+          nullable: true
         role:
           type: string
           enum: [protagonist, antagonist, supporting, minor]
@@ -352,6 +357,8 @@ components:
         personality:
           type: ["string", "null"]
         physicalDescription:
+          type: ["string", "null"]
+        relationships:
           type: ["string", "null"]
         imageUrl:
           type: ["string", "null"]
@@ -376,11 +383,15 @@ components:
           type: string
         chapterNumber:
           type: integer
+        sequenceOrder:
+          type: ["integer", "null"]
         pageNumber:
           type: ["integer", "null"]
         audioUrl:
           type: ["string", "null"]
         context:
+          type: ["string", "null"]
+        addressedTo:
           type: ["string", "null"]
 
     StoryEvent:
@@ -395,8 +406,12 @@ components:
           type: string
         description:
           type: ["string", "null"]
+        visualDescription:
+          type: ["string", "null"]
         chapterNumber:
           type: integer
+        sequenceOrder:
+          type: ["integer", "null"]
         location:
           type: ["string", "null"]
         imageUrl:

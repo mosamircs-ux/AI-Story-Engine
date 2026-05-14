@@ -11,6 +11,7 @@ export interface Character {
   id: number;
   novelId: number;
   name: string;
+  aliases?: string[] | null;
   role: CharacterRole;
   /** @nullable */
   description?: string | null;
@@ -18,6 +19,8 @@ export interface Character {
   personality?: string | null;
   /** @nullable */
   physicalDescription?: string | null;
+  /** @nullable */
+  relationships?: string | null;
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */

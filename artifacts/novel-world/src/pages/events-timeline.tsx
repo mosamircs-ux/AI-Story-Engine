@@ -121,6 +121,11 @@ export function EventsTimeline() {
                           <p className="text-muted-foreground leading-relaxed text-lg">
                             {event.description}
                           </p>
+                          {event.visualDescription && (
+                            <p className="text-sm text-muted-foreground/60 italic border-l-2 border-primary/20 pl-4 leading-relaxed">
+                              {event.visualDescription}
+                            </p>
+                          )}
 
                           <div className="flex flex-wrap gap-4 pt-4 border-t border-border/50">
                             {event.location && (

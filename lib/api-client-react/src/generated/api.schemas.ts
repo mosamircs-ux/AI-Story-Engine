@@ -58,6 +58,7 @@ export interface Character {
   id: number;
   novelId: number;
   name: string;
+  aliases?: string[] | null;
   role: CharacterRole;
   /** @nullable */
   description?: string | null;
@@ -65,6 +66,8 @@ export interface Character {
   personality?: string | null;
   /** @nullable */
   physicalDescription?: string | null;
+  /** @nullable */
+  relationships?: string | null;
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */
@@ -81,7 +84,11 @@ export interface StoryEvent {
   title: string;
   /** @nullable */
   description?: string | null;
+  /** @nullable */
+  visualDescription?: string | null;
   chapterNumber: number;
+  /** @nullable */
+  sequenceOrder?: number | null;
   /** @nullable */
   location?: string | null;
   /** @nullable */
@@ -107,9 +114,13 @@ export interface DialogueLine {
   text: string;
   chapterNumber: number;
   /** @nullable */
+  sequenceOrder?: number | null;
+  /** @nullable */
   pageNumber?: number | null;
   /** @nullable */
   audioUrl?: string | null;
   /** @nullable */
   context?: string | null;
+  /** @nullable */
+  addressedTo?: string | null;
 }

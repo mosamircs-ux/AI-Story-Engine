@@ -13,9 +13,13 @@ export interface DialogueLine {
   text: string;
   chapterNumber: number;
   /** @nullable */
+  sequenceOrder?: number | null;
+  /** @nullable */
   pageNumber?: number | null;
   /** @nullable */
   audioUrl?: string | null;
   /** @nullable */
   context?: string | null;
+  /** @nullable */
+  addressedTo?: string | null;
 }

@@ -12,7 +12,11 @@ export interface StoryEvent {
   title: string;
   /** @nullable */
   description?: string | null;
+  /** @nullable */
+  visualDescription?: string | null;
   chapterNumber: number;
+  /** @nullable */
+  sequenceOrder?: number | null;
   /** @nullable */
   location?: string | null;
   /** @nullable */
