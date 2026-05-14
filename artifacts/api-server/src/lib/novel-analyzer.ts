@@ -72,21 +72,33 @@ interface ChunkAnalysis {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Split text into chunks of ~CHUNK_SIZE chars, respecting paragraph boundaries */
+const MAX_CHUNKS = 20;
+
+/** Split text into chunks of ~CHUNK_SIZE chars, respecting paragraph boundaries.
+ *  If the resulting chunk count exceeds MAX_CHUNKS, evenly samples MAX_CHUNKS
+ *  chunks from throughout the text so large novels don't cause unbounded LLM calls. */
 function chunkText(text: string, chunkSize = 8000): string[] {
-  const chunks: string[] = [];
+  const allChunks: string[] = [];
   let start = 0;
   while (start < text.length) {
     let end = Math.min(start + chunkSize, text.length);
-    // Try to break at a paragraph boundary
     if (end < text.length) {
       const breakAt = text.lastIndexOf("\n\n", end);
       if (breakAt > start + chunkSize * 0.6) end = breakAt;
     }
-    chunks.push(text.slice(start, end).trim());
+    allChunks.push(text.slice(start, end).trim());
     start = end;
   }
-  return chunks.filter(Boolean);
+  const filtered = allChunks.filter(Boolean);
+  if (filtered.length <= MAX_CHUNKS) return filtered;
+
+  // Evenly sample MAX_CHUNKS from the full set so we cover beginning, middle, end
+  const sampled: string[] = [];
+  for (let i = 0; i < MAX_CHUNKS; i++) {
+    const idx = Math.round((i / (MAX_CHUNKS - 1)) * (filtered.length - 1));
+    sampled.push(filtered[idx]);
+  }
+  return sampled;
 }
 
 /** Detect chapter number from a text chunk */

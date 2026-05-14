@@ -110,11 +110,6 @@ router.post("/novels/:novelId/analyze", async (req, res) => {
     res.status(404).json({ error: "Novel not found" });
     return;
   }
-  if (novel.status === "analyzing") {
-    res.json(novel);
-    return;
-  }
-
   // Clear any previous analysis data (re-analysis support)
   await db.delete(characters).where(eq(characters.novelId, novelId));
   await db.delete(storyEvents).where(eq(storyEvents.novelId, novelId));
