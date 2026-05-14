@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Wt9wm1SPb9SdP-Z3bIj88"
+uri = "file://artifacts/novel-world-mobile/assets/images/icon.png"
+type = "image"
+title = "novel world mobile icon"
+
+[[generated]]
+id = "JZiUhGssG3sIJWlu6LwHV"
+uri = "file://artifacts/novel-world-mobile/assets/images/splash.png"
+type = "image"
+title = "novel world mobile splash"
